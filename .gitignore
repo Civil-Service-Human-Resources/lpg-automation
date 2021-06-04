@@ -1,3 +1,4 @@
 .terraform
 .vscode
 __pycache__
+localassets.json

@@ -9,17 +9,6 @@ import sys
 
 class Config:
 
-    MYSQL_HOST = None
-    CSRS_DATABASE = None
-    MYSQL_USER = None
-    MYSQL_PASSWORD = None
-    MYSQL_PORT = None
-    MYSQL_CERT = None
-
-    GOVUK_NOTIFY_API_KEY = None
-
-    EMAIL_TEMPLATE_ID = None
-
     def __init__(self) -> None:
 
         self.MYSQL_HOST = automationassets.get_automation_variable("MYSQL_HOST")
