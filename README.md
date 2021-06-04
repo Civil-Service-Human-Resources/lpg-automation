@@ -31,9 +31,9 @@ Additionally, the requirements for the runbook (found in the `requirements.txt` 
 
 As previously mentioned, the python runbooks in this repository make use of a local module called `automationassets.py`. This module simulates the automation assets found in the Azure Runbook environment.
 
-To populate the necessary variables for automation assets locally, they must be added to the `localassets.json` file. An example of this file can be found here: https://github.com/azureautomation/python_emulated_assets/blob/master/automationassets/localassets.json
+To populate the necessary variables for automation assets locally, they must be added to a `localassets.json` file. An example of this file can be found here: https://github.com/azureautomation/python_emulated_assets/blob/master/automationassets/localassets.json
 
-**Important**: the `localassets.json` file has been removed from the git index for this repository - this means that any changes made to the file **will not** be tracked. This is to prevent accidentally committing sensitive variables.
+**Important**: the `localassets.json` file is **not** in source control, and must be provided locally in the same directory as `automationassets.py`.
 
 ### Running the runbook
 
