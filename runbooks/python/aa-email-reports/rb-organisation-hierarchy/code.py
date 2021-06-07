@@ -93,7 +93,8 @@ def send_file_to_recipients(csv_file, recipients, gov_uk_notify_key, email_templ
         info(f"Sending csv file to {len(recipients)} recipients")
         for recipient in recipients:
 
-            response = notifications_client.send_email_notification(
+            # Errors will flow up to the job and be reported in the logs
+            notifications_client.send_email_notification(
                 email_address=recipient,
                 template_id=email_template_id,
                 personalisation=personalisation
@@ -137,6 +138,8 @@ def get_recipients(args):
         invalid_emails_str = ", ".join(invalid_emails)
         raise ValueError(f"The following email addresses are invalid: {invalid_emails_str}")
 
+    recipients_str = ",".join(separated_emails)
+    info(f"Recipients for this job: {recipients_str}")
     return separated_emails
 
 try:
