@@ -108,7 +108,7 @@ def run(args, config: Config):
                                     config.MYSQL_PASSWORD,
                                     config.MYSQL_HOST,
                                     config.MYSQL_PORT,
-                                    config.CSRS_DATABASE)
+                                    config.MYSQL_DATABASE)
 
     table_data = fetch_data_from_mysql(mysql_conn)
 
