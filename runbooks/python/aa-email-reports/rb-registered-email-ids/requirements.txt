@@ -1,0 +1,2 @@
+mysql-connector-python==8.0.25
+notifications-python-client==6.1.0
