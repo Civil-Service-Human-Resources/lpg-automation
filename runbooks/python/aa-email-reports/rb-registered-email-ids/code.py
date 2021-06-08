@@ -43,9 +43,9 @@ def get_mysql_connection(sql_user, sql_password, sql_host, sql_port, sql_databas
         error(f"Error connecting to database: {e}")
 
 
-def fetch_data_from_mysql(sql_connection):
+def fetch_data_from_mysql(mysql_connection):
 
-    cursor = sql_connection.cursor()
+    cursor = mysql_connection.cursor()
     cursor.execute(MYSQL_SQL)
     results = cursor.fetchall()
 
@@ -101,21 +101,21 @@ def send_file_to_recipients(csv_file, recipients, gov_uk_notify_key, email_templ
 def run(args, config: Config):
 
     recipients = get_recipients(args)
-    sql_conn = get_mysql_connection(config.MYSQL_USER,
+    mysql_conn = get_mysql_connection(config.MYSQL_USER,
                                     config.MYSQL_PASSWORD,
                                     config.MYSQL_HOST,
                                     config.MYSQL_PORT,
                                     config.MYSQL_DATABASE)
 
-    table_data = fetch_data_from_mysql(sql_conn)
+    table_data = fetch_data_from_mysql(mysql_conn)
 
     if table_data:
         csv_file = create_csv_file(table_data)
         send_file_to_recipients(csv_file, recipients, config.GOVUK_NOTIFY_API_KEY, config.EMAIL_TEMPLATE_ID)
 
-    if sql_conn.is_connected():
+    if mysql_conn.is_connected():
         info("Closing SQL connection")
-        sql_conn.close()
+        mysql_conn.close()
 
 
 def get_recipients(args):
