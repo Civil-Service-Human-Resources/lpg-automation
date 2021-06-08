@@ -12,20 +12,17 @@ class Config:
     def __init__(self) -> None:
 
         self.MYSQL_HOST = automationassets.get_automation_variable("MYSQL_HOST")
-        self.CSRS_DATABASE = automationassets.get_automation_variable("CSRS_DATABASE")
+        self.MYSQL_DATABASE = automationassets.get_automation_variable("IDENTITY_DATABASE")
         self.MYSQL_USER = automationassets.get_automation_variable("MYSQL_USER")
         self.MYSQL_PASSWORD = automationassets.get_automation_variable("MYSQL_PASSWORD")
         self.MYSQL_PORT = automationassets.get_automation_variable("MYSQL_PORT")
 
         self.GOVUK_NOTIFY_API_KEY = automationassets.get_automation_variable("GOVUK_NOTIFY_API_KEY")
 
-        self.EMAIL_TEMPLATE_ID = automationassets.get_automation_variable("ORG_HIERARCHY_EMAIL_TEMPLATE_ID")
+        self.EMAIL_TEMPLATE_ID = automationassets.get_automation_variable("REGISTERED_EMAIL_IDS_EMAIL_TEMPLATE_ID")
 
-ORGANISATION_HIERARCHY_SQL = """
-    select ou.id, ou.name, ou.abbreviation, ou.code, ou.agency_token_id, ou.payment_methods, ou.parent_id, pou.name as "parent_name"
-    from csrs.organisational_unit ou 
-    left outer join csrs.organisational_unit pou on ou.parent_id = pou.id
-    order by pou.name asc, ou.name asc;
+MYSQL_SQL = """
+    select email, substring_index(email, "@", -1) domain from identity.identity order by domain, email;
 """
 
 EMAIL_REGEX = '^(\w|\.|\_|\-)+[@](\w|\_|\-|\.)+[.]\w{2,3}$'
@@ -39,17 +36,17 @@ def error(msg):
     print(f"ERROR: - {msg}")
 
 
-def get_sql_connection(sql_user, sql_password, sql_host, sql_port, sql_database):
+def get_mysql_connection(sql_user, sql_password, sql_host, sql_port, sql_database):
     try:
         return mysql.connector.connect(user=sql_user, password=sql_password, host=sql_host, port=sql_port, database=sql_database)
     except Exception as e:
         error(f"Error connecting to database: {e}")
 
 
-def fetch_org_hierarchy(sql_connection):
+def fetch_data_from_mysql(sql_connection):
 
     cursor = sql_connection.cursor()
-    cursor.execute(ORGANISATION_HIERARCHY_SQL)
+    cursor.execute(MYSQL_SQL)
     results = cursor.fetchall()
 
     info(f"found {len(results)} DB rows")
@@ -104,13 +101,13 @@ def send_file_to_recipients(csv_file, recipients, gov_uk_notify_key, email_templ
 def run(args, config: Config):
 
     recipients = get_recipients(args)
-    sql_conn = get_sql_connection(config.MYSQL_USER,
+    sql_conn = get_mysql_connection(config.MYSQL_USER,
                                     config.MYSQL_PASSWORD,
                                     config.MYSQL_HOST,
                                     config.MYSQL_PORT,
-                                    config.CSRS_DATABASE)
+                                    config.MYSQL_DATABASE)
 
-    table_data = fetch_org_hierarchy(sql_conn)
+    table_data = fetch_data_from_mysql(sql_conn)
 
     if table_data:
         csv_file = create_csv_file(table_data)
