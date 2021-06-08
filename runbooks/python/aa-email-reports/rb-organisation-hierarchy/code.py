@@ -5,14 +5,13 @@ import automationassets
 import csv
 import re
 import tempfile
-import sys
 
 class Config:
 
     def __init__(self) -> None:
 
         self.MYSQL_HOST = automationassets.get_automation_variable("MYSQL_HOST")
-        self.CSRS_DATABASE = automationassets.get_automation_variable("CSRS_DATABASE")
+        self.MYSQL_SCHEMA = automationassets.get_automation_variable("CSRS_DATABASE")
         self.MYSQL_USER = automationassets.get_automation_variable("MYSQL_USER")
         self.MYSQL_PASSWORD = automationassets.get_automation_variable("MYSQL_PASSWORD")
         self.MYSQL_PORT = automationassets.get_automation_variable("MYSQL_PORT")
@@ -20,6 +19,8 @@ class Config:
         self.GOVUK_NOTIFY_API_KEY = automationassets.get_automation_variable("GOVUK_NOTIFY_API_KEY")
 
         self.EMAIL_TEMPLATE_ID = automationassets.get_automation_variable("ORG_HIERARCHY_EMAIL_TEMPLATE_ID")
+
+        self.RECIPIENTS = automationassets.get_automation_variable("ORG_HIERARCHY_EMAIL_RECIPIENTS")
 
 ORGANISATION_HIERARCHY_SQL = """
     select ou.id, ou.name, ou.abbreviation, ou.code, ou.agency_token_id, ou.payment_methods, ou.parent_id, pou.name as "parent_name"
@@ -46,7 +47,7 @@ def get_sql_connection(sql_user, sql_password, sql_host, sql_port, sql_database)
         error(f"Error connecting to database: {e}")
 
 
-def fetch_org_hierarchy(sql_connection):
+def fetch_table_data(sql_connection):
 
     cursor = sql_connection.cursor()
     cursor.execute(ORGANISATION_HIERARCHY_SQL)
@@ -101,16 +102,16 @@ def send_file_to_recipients(csv_file, recipients, gov_uk_notify_key, email_templ
             )
 
 
-def run(args, config: Config):
+def run(config: Config):
 
-    recipients = get_recipients(args)
+    recipients = get_recipients(config.RECIPIENTS)
     sql_conn = get_sql_connection(config.MYSQL_USER,
                                     config.MYSQL_PASSWORD,
                                     config.MYSQL_HOST,
                                     config.MYSQL_PORT,
-                                    config.CSRS_DATABASE)
+                                    config.MYSQL_SCHEMA)
 
-    table_data = fetch_org_hierarchy(sql_conn)
+    table_data = fetch_table_data(sql_conn)
 
     if table_data:
         csv_file = create_csv_file(table_data)
@@ -121,13 +122,11 @@ def run(args, config: Config):
         sql_conn.close()
 
 
-def get_recipients(args):
+def get_recipients(emails):
 
-    if len(args) <= 1:
-        raise ValueError("1 argument required: comma separated email recipients")
-
-    emails = args[1]
     separated_emails = emails.split(",")
+    if not separated_emails:
+        raise ValueError("No recipients provided")
 
     invalid_emails = []
     for email in separated_emails:
@@ -144,6 +143,6 @@ def get_recipients(args):
 
 try:
     config = Config()
-    run(sys.argv, config)
+    run(config)
 except Exception as e:
     error(e)
