@@ -2,7 +2,7 @@
 
 ## Overview
 
-This runbook queries the IDENTITY database for the registered email ids - the email ids are then saved to a virtual CSV file, which is zipped and password protected before uploadin on to Azure blob storage. An email is sent to the intended recipients via GOV.UK notify with the URL to the file to download it.
+This runbook queries the IDENTITY database for the registered email ids - the email ids are then saved to a virtual CSV file and emailed to recipients via GOV.UK notify.
 
 ## Automation Assets
 
