@@ -12,20 +12,17 @@ class Config:
     def __init__(self) -> None:
 
         self.MYSQL_HOST = automationassets.get_automation_variable("MYSQL_HOST")
-        self.MYSQL_DATABASE = automationassets.get_automation_variable("CSRS_DATABASE")
+        self.MYSQL_DATABASE = automationassets.get_automation_variable("IDENTITY_DATABASE")
         self.MYSQL_USER = automationassets.get_automation_variable("MYSQL_USER")
         self.MYSQL_PASSWORD = automationassets.get_automation_variable("MYSQL_PASSWORD")
         self.MYSQL_PORT = automationassets.get_automation_variable("MYSQL_PORT")
 
         self.GOVUK_NOTIFY_API_KEY = automationassets.get_automation_variable("GOVUK_NOTIFY_API_KEY")
 
-        self.EMAIL_TEMPLATE_ID = automationassets.get_automation_variable("ORG_HIERARCHY_EMAIL_TEMPLATE_ID")
+        self.EMAIL_TEMPLATE_ID = automationassets.get_automation_variable("REGISTERED_EMAIL_IDS_EMAIL_TEMPLATE_ID")
 
 MYSQL_SQL = """
-    select ou.id, ou.name, ou.abbreviation, ou.code, ou.agency_token_id, ou.payment_methods, ou.parent_id, pou.name as "parent_name"
-    from csrs.organisational_unit ou 
-    left outer join csrs.organisational_unit pou on ou.parent_id = pou.id
-    order by pou.name asc, ou.name asc;
+    select email, substring_index(email, "@", -1) domain from identity.identity order by domain, email;
 """
 
 EMAIL_REGEX = '^(\w|\.|\_|\-)+[@](\w|\_|\-|\.)+[.]\w{2,3}$'
