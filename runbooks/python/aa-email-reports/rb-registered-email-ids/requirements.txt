@@ -1,2 +1,2 @@
-mysql-connector-python==8.0.25
+mysql-connector-python==9.3.0
 notifications-python-client==6.1.0
